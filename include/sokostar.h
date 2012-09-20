@@ -59,6 +59,10 @@ class SokoStar
 
         std::vector<int> rBlocksPushed; /**< the blocks we push (in reverse) */
         std::vector<int> rPushDirection; /**< the direction we push the blocks (in reverse) */
+        std::vector<std::vector<int> > rRobotMovements; /**< the robot movements in between pushes (in reverse) */
+
+        // diagnostics
+        float msec; /**< how long in msec it took to solve */
 };
 
 #endif // SOKOSTAR_H

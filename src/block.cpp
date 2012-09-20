@@ -29,3 +29,24 @@ void Block::canPush(int direction) {
 bool Block::isBlocked(int direction) {
     return dir_blocked[direction];
 }
+
+/**
+ * Pushes the block in the specified direction
+ *@param direction the direction to push
+ */
+void Block::push(int direction) {
+    switch (direction) {
+        case UP:
+            y--;
+            break;
+        case DOWN:
+            y++;
+            break;
+        case LEFT:
+            x--;
+            break;
+        case RIGHT:
+            x++;
+            break;
+    }
+}

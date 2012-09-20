@@ -5,6 +5,8 @@
 #include "goal.h"
 #include "block.h"
 #include <vector>
+#include <string>
+#include <map>
 
 class State;
 
@@ -35,7 +37,7 @@ class Level
          * Returns the map
          *@return map
          */
-        int* getMap();
+        //int* getMap();
 
         /**
          * Returns the map width
@@ -73,10 +75,41 @@ class Level
          */
         State* getStart();
 
+        /**
+         * Returns the wall map
+         *@return wall_map
+         */
+        std::string* getWallMap();
+
+        /**
+         * Pushes a block, updating the level state itself
+         *@param block which block to push
+         *@param direction the direction to push the block
+         *@param path (out) the path the robot must take to make the push
+         */
+        void pushBlock(int block, int direction, std::vector<int>* path);
+
     private:
+        /**
+         * Grabs the best guess from the openset
+         *@param openset the open set
+         *@return the bets guess of where to go next
+         */
+        int best(std::map<int, int>& openset);
+
+        /**
+         * Evaluates (calculates h) how good this state is
+         * heuristic = manhatten distance
+         *@param index the location of the robot
+         *@param bx destination x
+         *@param by destination y
+         */
+        int evaluate(int index, int block, int direction);
+
         int width; /**< width of the level */
         int height; /**< height of the level */
-        int* map; /**< the level itself */
+        //int* map; /**< the level itself */
+        std::string walls; /**< the walls */
 
         Robot* robot; /**< there is exactly 1 robot in a level */
         std::vector<Goal *> goals; /**< there can be many goals */

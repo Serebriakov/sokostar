@@ -110,11 +110,12 @@ class State
         std::vector<Block *> blocks; /**< the blocks in the stage */
         std::map<int, Block *> blocksPos; /**< reference the blocks by position */
         std::vector<Goal *>& goals; /**< the goals to put the blocks on */
-        std::string value; /**< the value of the state */
-        std::string wall_map; /**< the walls in the stage */
+        std::string* wall_map; /**< the walls in the stage */
 
         int width; /**< width of the map */
 
+        // A* stuff
+        std::string value; /**< the value of the state */
         int g; /**< the cost to reach this state */
         int h; /**< the heuristic estimate of this state */
 
