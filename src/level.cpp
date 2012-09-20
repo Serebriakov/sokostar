@@ -11,7 +11,6 @@
 Level::Level() {
     width = 0;
     height = 0;
-    //map = NULL;
     robot = NULL;
     start = NULL;
 }
@@ -20,10 +19,6 @@ Level::Level() {
  * Clears memory used by the level
  */
 Level::~Level() {
-    /*if (map != NULL) {
-        delete map;
-        map = NULL;
-    }*/
     if (robot != NULL) {
         delete robot;
         robot = NULL;
@@ -69,14 +64,12 @@ bool Level::load(char* file) {
         }
         fclose(f);
 
-        //int* map = new int[width*height];
         walls = "";
         int x = 0;
         int y = 0;
         for (unsigned int i = 0; i < mapstr.size(); i++) {
             if (mapstr[i] != '\n') {
                 // place walls
-                //map[y*width+x] = mapstr[i] == WALL ? WALL : EMPTY;
                 walls += mapstr[i] == WALL ? WALL : EMPTY;
 
                 // place additional objects
@@ -103,7 +96,6 @@ bool Level::load(char* file) {
                 x++;
             } else {
                 while (x < width) {
-                    //map[y*width+x] = EMPTY;
                     walls += EMPTY;
                     x++;
                 }
@@ -117,13 +109,6 @@ bool Level::load(char* file) {
             return false;
         }
 
-        /*for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                printf("%c", map[i*width+j]);
-            }
-            printf("\n");
-        }*/
-
         start = new State(*this);
 
         //printf("%s\n", start->get().c_str());
@@ -133,14 +118,6 @@ bool Level::load(char* file) {
     printf("File %s not found\n", file);
     return false;
 }
-
-/**
- * Returns the map
- *@return map
- */
-/*int* Level::getMap() {
-    return map;
-}*/
 
 /**
  * Returns the map width
