@@ -1,0 +1,71 @@
+# depslib dependency file v1.0
+1348100580 source:c:\users\mclovin\documents\rip\sokostar\src\level.cpp
+	"level.h"
+	"state.h"
+	"constants.h"
+	<cstdio>
+	<string>
+
+1348100330 c:\users\mclovin\documents\rip\sokostar\include\level.h
+	"robot.h"
+	"goal.h"
+	"block.h"
+	<vector>
+
+1348102803 source:c:\users\mclovin\documents\rip\sokostar\src\sokostar.cpp
+	"sokostar.h"
+	<vector>
+	<cstdio>
+	"constants.h"
+
+1348101508 c:\users\mclovin\documents\rip\sokostar\include\sokostar.h
+	"level.h"
+	"state.h"
+	<map>
+	<string>
+
+1348101652 source:c:\users\mclovin\documents\rip\sokostar\main.cpp
+	<cstdio>
+	"sokostar.h"
+
+1348077085 c:\users\mclovin\documents\rip\sokostar\include\robot.h
+	"object.h"
+
+1348092174 c:\users\mclovin\documents\rip\sokostar\include\object.h
+
+1348092174 source:c:\users\mclovin\documents\rip\sokostar\src\object.cpp
+	"object.h"
+
+1348076986 source:c:\users\mclovin\documents\rip\sokostar\src\robot.cpp
+	"robot.h"
+
+1348077408 c:\users\mclovin\documents\rip\sokostar\include\goal.h
+	"object.h"
+
+1348098019 c:\users\mclovin\documents\rip\sokostar\include\block.h
+	"object.h"
+	<vector>
+
+1348097995 source:c:\users\mclovin\documents\rip\sokostar\src\block.cpp
+	"block.h"
+	"constants.h"
+
+1348077380 source:c:\users\mclovin\documents\rip\sokostar\src\goal.cpp
+	"goal.h"
+
+1348102791 source:c:\users\mclovin\documents\rip\sokostar\src\state.cpp
+	"state.h"
+	"level.h"
+	<cmath>
+	"constants.h"
+	<cstdio>
+
+1348102400 c:\users\mclovin\documents\rip\sokostar\include\state.h
+	<string>
+	<vector>
+	<map>
+	"block.h"
+	"goal.h"
+
+1348094280 c:\users\mclovin\documents\rip\sokostar\include\constants.h
+
