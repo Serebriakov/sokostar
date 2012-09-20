@@ -1,6 +1,7 @@
 #include "sokostar.h"
 #include <vector>
 #include <cstdio>
+#include <sys/time.h>
 #include "constants.h"
 
 /**
@@ -15,6 +16,7 @@ SokoStar::SokoStar() {
  *@return true on success, false if there was a problem loading the level
  */
 bool SokoStar::load(char* file) {
+    printf("Loading file: %s\n", file);
     return level.load(file);
 }
 
@@ -25,8 +27,15 @@ void SokoStar::solve() {
     std::map<std::string, State *> closedset;
     std::map<std::string, State *> openset;
     openset[level.getStart()->get()] = level.getStart();
-    std::map<std::string, std::string> came_from;
 
+    msec = 0;
+    struct timeval start;
+    struct timeval end;
+    gettimeofday(&start, NULL);
+
+    printf("Searching for a solution...\n");
+
+    //A* states
     while (!openset.empty()) {
         State* current = best(openset);
 
@@ -54,6 +63,16 @@ void SokoStar::solve() {
         }
     }
 
+    // now get the robot paths
+    for (int i = (int)rBlocksPushed.size()-1; i >= 0; i--) {
+        rRobotMovements.push_back(std::vector<int>());
+        level.pushBlock(rBlocksPushed[i], rPushDirection[i], &rRobotMovements[rRobotMovements.size()-1]);
+    }
+
+    gettimeofday(&end, NULL);
+    msec = (end.tv_sec-start.tv_sec)*1000.f+(end.tv_usec-start.tv_usec)/1000.f;
+    //msec = clock()-start;///CLOCKS_PER_SEC*1000;
+
     for (std::map<std::string, State *>::iterator i = openset.begin(); i != openset.end(); i++) {
         delete i->second;
     }
@@ -62,6 +81,8 @@ void SokoStar::solve() {
             delete i->second;
         }
     }
+
+
 }
 
 /**
@@ -72,8 +93,16 @@ void SokoStar::printSolution() {
         printf("This level has no solution\n");
     } else {
         for (int i = (int)rBlocksPushed.size()-1; i >= 0; i--) {
+            for (int j = (int)rRobotMovements[rRobotMovements.size()-i-1].size()-1; j >= 0; j--) {
+                printf("Move %s\n", asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
+            }
             printf("Push block(%d) %s\n", rBlocksPushed[i], asDirection(rPushDirection[i]));
         }
+    }
+    if (msec <= 0.f) {
+        printf("Solver was too fast, could not measure time\n");
+    } else {
+        printf("Solver took %f msec\n", msec);
     }
 }
 

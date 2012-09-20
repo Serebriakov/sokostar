@@ -16,11 +16,8 @@ State::State(Level& level): goals(level.getGoals()) {
     width = level.getWidth();
 
     // build state representation
-    wall_map = "";
-    for (int i = 0; i < width*level.getHeight(); i++) {
-        wall_map += (char)level.getMap()[i];
-    }
-    value = wall_map;
+    wall_map = level.getWallMap();
+    value = *wall_map;
     value[level.getRobot()->getX()+level.getRobot()->getY()*width] = ROBOT;
     for (unsigned int i = 0; i < level.getBlocks().size(); i++) {
         int index = level.getBlocks()[i]->getX()+level.getBlocks()[i]->getY()*width;
@@ -190,7 +187,7 @@ State::State(State* _parent, unsigned int block, int direction): goals(_parent->
 
     // build state representation
     wall_map = parent->wall_map;
-    value = wall_map;
+    value = *wall_map;
 
     // place the robot where the block was
     value[parent->blocks[block]->getX()+parent->blocks[block]->getY()*width] = ROBOT;

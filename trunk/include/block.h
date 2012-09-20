@@ -37,6 +37,12 @@ class Block: public Object
          */
         std::vector<int>& getPath(int direction);
 
+        /**
+         * Pushes the block in the specified direction
+         *@param direction the direction to push
+         */
+        void push(int direction);
+
     private:
         bool dir_blocked[4]; /**< whether or not each direction is blocked */
         std::vector<int> push_path[4]; /**< how to reach the spot where this block can be pushed */
