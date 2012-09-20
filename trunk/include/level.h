@@ -34,12 +34,6 @@ class Level
         bool load(char* file);
 
         /**
-         * Returns the map
-         *@return map
-         */
-        //int* getMap();
-
-        /**
          * Returns the map width
          *@return width
          */
@@ -104,11 +98,10 @@ class Level
          *@param bx destination x
          *@param by destination y
          */
-        int evaluate(int index, int block, int direction);
+        int evaluate(int index, int bx, int by);
 
         int width; /**< width of the level */
         int height; /**< height of the level */
-        //int* map; /**< the level itself */
         std::string walls; /**< the walls */
 
         Robot* robot; /**< there is exactly 1 robot in a level */
