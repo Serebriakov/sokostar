@@ -89,15 +89,21 @@ void SokoStar::solve() {
  * Prints the solution to stdout
  */
 void SokoStar::printSolution() {
+    printf("\n");
     if (!rBlocksPushed.size()) {
         printf("This level has no solution\n");
     } else {
+        //printf("\nSolution:\n");
         for (int i = (int)rBlocksPushed.size()-1; i >= 0; i--) {
             for (int j = (int)rRobotMovements[rRobotMovements.size()-i-1].size()-1; j >= 0; j--) {
                 printf("Move %s\n", asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
+                //printf("%c", asDirection(rRobotMovements[rRobotMovements.size()-i-1][j])[0]-'A'+'a');
             }
             printf("Push block(%d) %s\n", rBlocksPushed[i], asDirection(rPushDirection[i]));
+            //printf("%c", asDirection(rPushDirection[i])[0]);
         }
+        printf("\n");
+        //printf("\n\nnote: solution is in a common solution format\n(see: http://sokobano.de/wiki/index.php?title=Level_format#Solution)\n\n");
     }
     if (msec <= 0.f) {
         printf("Solver was too fast, could not measure time\n");
