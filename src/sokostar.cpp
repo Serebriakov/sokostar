@@ -28,12 +28,13 @@ void SokoStar::solve() {
     std::map<std::string, State *> openset;
     openset[level.getStart()->get()] = level.getStart();
 
+    printf("Searching for a solution...\n");
+
     msec = 0;
+    states = 0;
     struct timeval start;
     struct timeval end;
     gettimeofday(&start, NULL);
-
-    printf("Searching for a solution...\n");
 
     //A* states
     while (!openset.empty()) {
@@ -42,13 +43,15 @@ void SokoStar::solve() {
         openset.erase(current->get());
         closedset[current->get()] = current;
 
+        states++;
+
         if (current->getH() == 0) { // goal
             buildPath(current);
             break;
         }
 
         std::vector<State *> children;
-        current->getChildren(&children);
+        current->getChildren(&children, level);
         for (unsigned int i = 0; i < children.size(); i++) {
             if (closedset.count(children[i]->get())) {
                 continue;
@@ -89,27 +92,60 @@ void SokoStar::solve() {
  * Prints the solution to stdout
  */
 void SokoStar::printSolution() {
+    FILE* f = fopen("results.txt", "w");
+    if (f == NULL) {
+        fprintf(f, "Error writing results to results.txt\n");
+    }
     printf("\n");
     if (!rBlocksPushed.size()) {
         printf("This level has no solution\n");
+        if (f != NULL) {
+            fprintf(f, "This level has no solution\n");
+        }
     } else {
+        int step = 1;
         //printf("\nSolution:\n");
         for (int i = (int)rBlocksPushed.size()-1; i >= 0; i--) {
             for (int j = (int)rRobotMovements[rRobotMovements.size()-i-1].size()-1; j >= 0; j--) {
-                printf("Move %s\n", asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
+                printf("%d. Move %s\n", step++, asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
                 //printf("%c", asDirection(rRobotMovements[rRobotMovements.size()-i-1][j])[0]-'A'+'a');
+                if (f != NULL) {
+                    fprintf(f, "%d. Move %s\n", step++, asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
+                }
             }
-            printf("Push block(%d) %s\n", rBlocksPushed[i], asDirection(rPushDirection[i]));
+            printf("%d. Push block(%d) %s\n", step++, rBlocksPushed[i], asDirection(rPushDirection[i]));
             //printf("%c", asDirection(rPushDirection[i])[0]);
+            if (f != NULL) {
+                fprintf(f, "%d. Push block(%d) %s\n", step++, rBlocksPushed[i], asDirection(rPushDirection[i]));
+            }
         }
         printf("\n");
+        if (f != NULL) {
+            fprintf(f, "\n");
+        }
         //printf("\n\nnote: solution is in a common solution format\n(see: http://sokobano.de/wiki/index.php?title=Level_format#Solution)\n\n");
     }
     if (msec <= 0.f) {
-        printf("Solver was too fast, could not measure time\n");
+        printf("Solver was too fast (~0 msec), could not measure time\n");
+        if (f != NULL) {
+            fprintf(f, "Solver was too fast (~0 msec), could not measure time\n");
+        }
     } else {
         printf("Solver took %f msec\n", msec);
+        if (f != NULL) {
+            fprintf(f, "Solver took %f msec\n", msec);
+        }
     }
+    printf("%d Block States were expanded\n", states);
+    printf("%d Robot states were expanded\n", level.getRobotStatesExpanded());
+    if (f != NULL) {
+        fprintf(f, "%d Block States were expanded\n", states);
+        fprintf(f, "%d Robot states were expanded\n", level.getRobotStatesExpanded());
+
+        fclose(f);
+    }
+
+    printf("\nResults also written to results.txt\n");
 }
 
 /**
@@ -136,8 +172,9 @@ void SokoStar::buildPath(State* node) {
         //node->print();
         //printf("\n");
         if (node->getParent() != NULL) { //ie- not the start node
-            rBlocksPushed.push_back(node->getBlockPushed());
+            rBlocksPushed.push_back(node->getBlockPushedIndex());
             rPushDirection.push_back(node->getPushDirection());
+            //rRobotMovements.push_back(node->getBlockPushedPath());
         }
         node = node->getParent();
     }

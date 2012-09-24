@@ -13,6 +13,8 @@ Level::Level() {
     height = 0;
     robot = NULL;
     start = NULL;
+
+    states = 0;
 }
 
 /**
@@ -171,9 +173,115 @@ State* Level::getStart() {
  * Returns the wall map
  *@return wall_map
  */
-std::string* Level::getWallMap() {
-    return &walls;
+std::string& Level::getWallMap() {
+    return walls;
 }
+
+/**
+ * Determines the path the robot would need to take to push the block
+ *@param block which block to push
+ *@param direction the direction to push the block
+ *@param x robot x
+ *@param y robot y
+ *@param blockSet which set of blocks to use
+ */
+/*void Level::pathTo(int block, int direction, int x, int y, std::vector<Block *>* blockSet) {
+    int bx = (*blockSet)[block]->getX();
+    int by = (*blockSet)[block]->getY();
+    switch (direction) {
+        case UP:
+            by++;
+            break;
+        case DOWN:
+            by--;
+            break;
+        case LEFT:
+            bx++;
+            break;
+        case RIGHT:
+            bx--;
+            break;
+    }
+
+    //printf("pathTo(%dx%d => %dx%d)\n", x, y, bx, by);
+
+    int goal = bx+by*width;
+    int start = x+y*width;
+
+    std::map<int, int> closedset;
+    std::map<int, int> openset;
+    std::map<int, int> g_costs;
+    openset[start] = evaluate(start, bx, by);
+    g_costs[start] = 0;
+    std::map<int, int> came_from;
+
+    //A* states
+    while (!openset.empty()) {
+        int current = best(openset);
+
+        closedset[current] = openset[current];
+        openset.erase(current);
+
+        if (current == goal) { // goal
+            // reconstruct path
+            while (came_from.count(current)) {
+                int dir = UP;
+                int difference = came_from[current]-current;
+                if (difference == -1) {
+                    dir = RIGHT;
+                } else if (difference == 1) {
+                    dir = LEFT;
+                } else if (difference == -width) {
+                    dir = DOWN;
+                }
+                //path->push_back(dir);
+                //printf("%d ", dir);
+                (*blockSet)[block]->getPath(direction).push_back(dir);
+                current = came_from[current];
+            }
+            break;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int child = current;
+            switch (i) {
+                case UP:
+                    child -= width;
+                    break;
+                case DOWN:
+                    child += width;
+                    break;
+                case LEFT:
+                    child--;
+                    break;
+                case RIGHT:
+                    child++;
+                    break;
+            }
+
+            bool invalidSquare = false;
+            for (unsigned int j = 0; j < blockSet->size(); j++) {
+                if (child == (*blockSet)[j]->getX()+(*blockSet)[j]->getY()*width) {
+                    invalidSquare = true;
+                    break;
+                }
+            }
+
+            if (invalidSquare || walls[child] != EMPTY || closedset.count(child)) {
+                continue;
+            }
+            int tentative_g = g_costs[current]+1;
+
+            if (!openset.count(child) || tentative_g < g_costs[child]) {
+                came_from[child] = current;
+                g_costs[child] = tentative_g;
+                openset[child] = g_costs[child]+evaluate(child, bx, by);
+            }
+        }
+    }
+
+    //printf("\n");
+}*/
 
 /**
  * Pushes a block, updating the level state itself
@@ -198,13 +306,17 @@ void Level::pushBlock(int block, int direction, std::vector<int>* path) {
             bx--;
             break;
     }
+
+    //printf("pathTo(%dx%d => %dx%d)\n", x, y, bx, by);
+
     int goal = bx+by*width;
+    int start = robot->getX()+robot->getY()*width;
 
     std::map<int, int> closedset;
     std::map<int, int> openset;
     std::map<int, int> g_costs;
-    openset[robot->getX()+robot->getY()*width] = evaluate(robot->getX()+robot->getY()*width, bx, by);
-    g_costs[robot->getX()+robot->getY()*width] = 0;
+    openset[start] = evaluate(start, bx, by);
+    g_costs[start] = 0;
     std::map<int, int> came_from;
 
     //A* states
@@ -213,6 +325,8 @@ void Level::pushBlock(int block, int direction, std::vector<int>* path) {
 
         closedset[current] = openset[current];
         openset.erase(current);
+
+        states++;
 
         if (current == goal) { // goal
             // reconstruct path
@@ -227,6 +341,8 @@ void Level::pushBlock(int block, int direction, std::vector<int>* path) {
                     dir = DOWN;
                 }
                 path->push_back(dir);
+                //printf("%d ", dir);
+                //blocks[block]->getPath(direction).push_back(dir);
                 current = came_from[current];
             }
             break;
@@ -265,13 +381,21 @@ void Level::pushBlock(int block, int direction, std::vector<int>* path) {
             if (!openset.count(child) || tentative_g < g_costs[child]) {
                 came_from[child] = current;
                 g_costs[child] = tentative_g;
-                openset[child] = g_costs[child]+evaluate(child, block, direction);
+                openset[child] = g_costs[child]+evaluate(child, bx, by);
             }
         }
     }
 
     robot->placeAt(blocks[block]->getX(), blocks[block]->getY());
     blocks[block]->push(direction);
+}
+
+/**
+ * Returns how many robot states were opened
+ *@return states
+ */
+int Level::getRobotStatesExpanded() {
+    return states;
 }
 
 /**

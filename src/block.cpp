@@ -10,6 +10,7 @@ Block::Block(int _x, int _y): Object(_x, _y) {
     for (int i = 0; i < 4; i++) {
         dir_blocked[i] = true;
     }
+    onGoal = -1;
 }
 
 /**
@@ -31,6 +32,15 @@ bool Block::isBlocked(int direction) {
 }
 
 /**
+ * Returns the path to reach the blcok to push in this direction
+ *@return direction the direction you want to push the block
+ *@return the path to the block
+ */
+/*std::vector<int>& Block::getPath(int direction) {
+    return push_paths[direction];
+}*/
+
+/**
  * Pushes the block in the specified direction
  *@param direction the direction to push
  */
@@ -49,4 +59,20 @@ void Block::push(int direction) {
             x++;
             break;
     }
+}
+
+/**
+ * Returns the goal this block is on
+ *@return -1 if not on goal, otherwise onGoal
+ */
+int Block::getGoal() {
+    return onGoal;
+}
+
+/**
+ * Sets the block to be on a goal
+ *@param goal the goal to be on
+ */
+void Block::setOnGoal(int goal) {
+    onGoal = goal;
 }
