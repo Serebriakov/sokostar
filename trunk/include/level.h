@@ -73,7 +73,17 @@ class Level
          * Returns the wall map
          *@return wall_map
          */
-        std::string* getWallMap();
+        std::string& getWallMap();
+
+        /**
+         * Determines the path the robot would need to take to push the block
+         *@param block which block to push
+         *@param direction the direction to push the block
+         *@param x robot x
+         *@param y robot y
+         *@param blockSet which set of blocks to use
+         */
+        //void pathTo(int block, int direction, int x, int y, std::vector<Block *>* blockSet);
 
         /**
          * Pushes a block, updating the level state itself
@@ -82,6 +92,12 @@ class Level
          *@param path (out) the path the robot must take to make the push
          */
         void pushBlock(int block, int direction, std::vector<int>* path);
+
+        /**
+         * Returns how many robot states were opened
+         *@return states
+         */
+        int getRobotStatesExpanded();
 
     private:
         /**
@@ -109,6 +125,9 @@ class Level
         std::vector<Block *> blocks; /**< there can be many blocks */
 
         State* start; /**< the initial state */
+
+        // diagnostic
+        int states; /**< how many robot states are considered */
 };
 
 #endif // LEVEL_H

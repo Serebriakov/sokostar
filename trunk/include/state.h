@@ -34,8 +34,9 @@ class State
         /**
          * Returns the states this state can change into
          *@param children (out) the child states
+         *@param level the level these states are in
          */
-        void getChildren(std::vector<State *>* children);
+        void getChildren(std::vector<State *>* children, Level& level);
 
         /**
          * Returns the heuristic cost
@@ -64,7 +65,13 @@ class State
          * Returns the block that was pushed to get this state
          *@return blockPushed
          */
-        int getBlockPushed();
+        int getBlockPushedIndex();
+
+        /**
+         * Returns the path to reach the side of the block to push it
+         *@return the path to the block
+         */
+        //std::vector<int>& getBlockPushedPath();
 
         /**
          * Returns the direction that block was pushed
@@ -81,16 +88,18 @@ class State
         /**
          * Builds a child state from the parent
          *@param parent the parent state
+         *@param level the level that this state is in
          *@param block which block was pushed to reach this state
          *@param direction the direction it was pushed
          */
-        State(State* _parent, unsigned int block, int direction);
+        State(State* _parent, Level& level, unsigned int block, int direction);
 
         /**
          * Evaluates (calculates h) how good this state is
          * heuristic = manhatten distance
+         *@param goals the goals we want to cover
          */
-        void evaluate();
+        void evaluate(std::vector<Goal *>& goals);
 
         /**
          * Floodfills the robot's location
@@ -109,8 +118,8 @@ class State
 
         std::vector<Block *> blocks; /**< the blocks in the stage */
         std::map<int, Block *> blocksPos; /**< reference the blocks by position */
-        std::vector<Goal *>& goals; /**< the goals to put the blocks on */
-        std::string* wall_map; /**< the walls in the stage */
+        //std::vector<Goal *>& goals; /**< the goals to put the blocks on */
+        //std::string* wall_map; /**< the walls in the stage */
 
         int width; /**< width of the map */
 

@@ -35,7 +35,7 @@ class Block: public Object
          *@return direction the direction you want to push the block
          *@return the path to the block
          */
-        std::vector<int>& getPath(int direction);
+        //std::vector<int>& getPath(int direction);
 
         /**
          * Pushes the block in the specified direction
@@ -43,9 +43,22 @@ class Block: public Object
          */
         void push(int direction);
 
+        /**
+         * Returns the goal this block is on
+         *@return -1 if not on goal, otherwise onGoal
+         */
+        int getGoal();
+
+        /**
+         * Sets the block to be on a goal
+         *@param goal the goal to be on
+         */
+        void setOnGoal(int goal);
+
     private:
         bool dir_blocked[4]; /**< whether or not each direction is blocked */
-        std::vector<int> push_path[4]; /**< how to reach the spot where this block can be pushed */
+        int onGoal; /**< which goal this block is on */
+        //std::vector<int> push_paths[4]; /**< the paths to reach each side of the block */
 };
 
 #endif // BLOCK_H

@@ -8,7 +8,7 @@
 /**
  * Inits a new state from the level
  */
-State::State(Level& level): goals(level.getGoals()) {
+State::State(Level& level)/*: goals(level.getGoals())*/ {
     parent = NULL;
     blockPushed = -1;
     pushDirection = -1;
@@ -16,8 +16,8 @@ State::State(Level& level): goals(level.getGoals()) {
     width = level.getWidth();
 
     // build state representation
-    wall_map = level.getWallMap();
-    value = *wall_map;
+    //wall_map = level.getWallMap();
+    value = level.getWallMap();//*wall_map;
     value[level.getRobot()->getX()+level.getRobot()->getY()*width] = ROBOT;
     for (unsigned int i = 0; i < level.getBlocks().size(); i++) {
         int index = level.getBlocks()[i]->getX()+level.getBlocks()[i]->getY()*width;
@@ -26,8 +26,8 @@ State::State(Level& level): goals(level.getGoals()) {
         blocksPos[index] = blocks[i];
     }
 
-    for (unsigned int i = 0; i < goals.size(); i++) {
-        int index = goals[i]->getX()+goals[i]->getY()*width;
+    for (unsigned int i = 0; i < level.getGoals().size(); i++) {
+        int index = level.getGoals()[i]->getX()+level.getGoals()[i]->getY()*width;
         if (value[index] == ROBOT) {
             value[index] = ROBOT_ON_GOAL;
         } else if (value[index] == BLOCK) {
@@ -37,17 +37,12 @@ State::State(Level& level): goals(level.getGoals()) {
         }
     }
 
-    floodFill(level.getRobot()->getX(), level.getRobot()->getY());
-
-    /*for (int i = 0; i < blocks.size(); i++) {
-        printf("block %d can be pushed up?: %d\n", i, !blocks[i]->isBlocked(UP));
-        printf("block %d can be pushed down?: %d\n", i, !blocks[i]->isBlocked(DOWN));
-        printf("block %d can be pushed left?: %d\n", i, !blocks[i]->isBlocked(LEFT));
-        printf("block %d can be pushed right?: %d\n", i, !blocks[i]->isBlocked(RIGHT));
-    }*/
-
     g = 0;
-    evaluate();
+    evaluate(level.getGoals());
+
+    if (h) {
+        floodFill(level.getRobot()->getX(), level.getRobot()->getY());
+    }
 }
 
 /**
@@ -138,12 +133,13 @@ void State::floodFill(int x, int y, int dir) {
 /**
  * Returns the states this state can change into
  *@param children (out) the child states
+ *@param level the level these states are in
  */
-void State::getChildren(std::vector<State *>* children) {
+void State::getChildren(std::vector<State *>* children, Level& level) {
     for (unsigned int i = 0; i < blocks.size(); i++) {
         for (int j = 0; j < 4; j++) {
             if (!blocks[i]->isBlocked(j)) {
-                children->push_back(new State(this, i, j));
+                children->push_back(new State(this, level, i, j));
             }
         }
     }
@@ -175,10 +171,11 @@ int State::getF() {
 /**
  * Builds a child state from the parent
  *@param parent the parent state
+ *@param level the level that this state is in
  *@param block which block was pushed to reach this state
  *@param direction the direction it was pushed
  */
-State::State(State* _parent, unsigned int block, int direction): goals(_parent->goals) {
+State::State(State* _parent, Level& level, unsigned int block, int direction)/*: goals(_parent->goals)*/ {
     parent = _parent;
     blockPushed = block;
     pushDirection = direction;
@@ -186,8 +183,8 @@ State::State(State* _parent, unsigned int block, int direction): goals(_parent->
     width = parent->width;
 
     // build state representation
-    wall_map = parent->wall_map;
-    value = *wall_map;
+    //wall_map = parent->wall_map;
+    value = level.getWallMap();//*wall_map;
 
     // place the robot where the block was
     value[parent->blocks[block]->getX()+parent->blocks[block]->getY()*width] = ROBOT;
@@ -216,8 +213,8 @@ State::State(State* _parent, unsigned int block, int direction): goals(_parent->
         blocksPos[index] = blocks[i];
     }
 
-    for (unsigned int i = 0; i < goals.size(); i++) {
-        int index = goals[i]->getX()+goals[i]->getY()*width;
+    for (unsigned int i = 0; i < level.getGoals().size(); i++) {
+        int index =  level.getGoals()[i]->getX()+ level.getGoals()[i]->getY()*width;
         if (value[index] == ROBOT) {
             value[index] = ROBOT_ON_GOAL;
         } else if (value[index] == BLOCK) {
@@ -227,38 +224,63 @@ State::State(State* _parent, unsigned int block, int direction): goals(_parent->
         }
     }
 
-    floodFill(parent->blocks[block]->getX(), parent->blocks[block]->getY());
+    //printf("parent[%d,%d] => me[%d,%d]\n", parent->blockPushed, parent->pushDirection, block, direction);
 
-    /*for (int i = 0; i < blocks.size(); i++) {
-        printf("block %d can be pushed up?: %d\n", i, !blocks[i]->isBlocked(UP));
-        printf("block %d can be pushed down?: %d\n", i, !blocks[i]->isBlocked(DOWN));
-        printf("block %d can be pushed left?: %d\n", i, !blocks[i]->isBlocked(LEFT));
-        printf("block %d can be pushed right?: %d\n", i, !blocks[i]->isBlocked(RIGHT));
-    }*/
+    //g = parent->g+1;
+    g = parent->g;
+    if (parent->blockPushed != blockPushed) {
+        g += blocks.size();
+    }
+    /*if (parent->parent == NULL) { // parent is start state
+        level.pathTo(block, direction, level.getRobot()->getX(), level.getRobot()->getY(), &(parent->blocks));
+    } else {
+        level.pathTo(block, direction, parent->parent->blocks[parent->blockPushed]->getX(), parent->parent->blocks[parent->blockPushed]->getY(), &(parent->blocks));
+    }
+    g = parent->g+parent->blocks[block]->getPath(direction).size();*/
+    evaluate(level.getGoals());
 
-    g = parent->g+1;
-    evaluate();
+    if (h) {
+        floodFill(parent->blocks[block]->getX(), parent->blocks[block]->getY());
+    }
 }
 
 /**
  * Evaluates (calculates h) how good this state is
  * heuristic = manhatten distance
+ *@param goals the goals we want to cover
  */
-void State::evaluate() {
+void State::evaluate(std::vector<Goal *>& goals) {
     h = 0;
     // blocks can be re-counted, we just care how close a block is to this goal
     for (unsigned int i = 0; i < goals.size(); i++) {
-        int distance = -1;
         for (unsigned int j = 0; j < blocks.size(); j++) {
-            int new_distance = std::abs(blocks[j]->getX()-goals[i]->getX())+std::abs(blocks[j]->getY()-goals[i]->getY());
-            if (distance == -1 || new_distance < distance) {
-                distance = new_distance;
-                if (distance == 0) { // can't get better than this
-                    break;
+            if (std::abs(blocks[j]->getX()-goals[i]->getX())+std::abs(blocks[j]->getY()-goals[i]->getY()) == 0) {
+                blocks[j]->setOnGoal(i);
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < goals.size(); i++) {
+        int distance = -1;
+        int blockJ = -1;
+        for (unsigned int j = 0; j < blocks.size(); j++) {
+            if (blocks[j]->getGoal() == (signed)i) {
+                distance = 0;
+                break;
+            } else if (blocks[j]->getGoal() == -1) {
+                int new_distance = std::abs(blocks[j]->getX()-goals[i]->getX())+std::abs(blocks[j]->getY()-goals[i]->getY());
+                if (distance == -1 || new_distance < distance) {
+                    distance = new_distance;
+                    blockJ = i;
+                    if (distance == 0) { // can't get better than this
+                        break;
+                    }
                 }
             }
         }
-        h += distance;
+        if (distance != 0) {
+            h += distance+1;
+        }
     }
 }
 
@@ -274,9 +296,17 @@ State* State::getParent() {
  * Returns the block that was pushed to get this state
  *@return blockPushed
  */
-int State::getBlockPushed() {
+int State::getBlockPushedIndex() {
     return blockPushed;
 }
+
+/**
+ * Returns the path to reach the side of the block to push it
+ *@return the path to the block
+ */
+/*std::vector<int>& State::getBlockPushedPath() {
+    return parent->blocks[blockPushed]->getPath(pushDirection);
+}*/
 
 /**
  * Returns the direction that block was pushed
