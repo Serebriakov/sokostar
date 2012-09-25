@@ -226,10 +226,10 @@ State::State(State* _parent, Level& level, unsigned int block, int direction)/*:
 
     //printf("parent[%d,%d] => me[%d,%d]\n", parent->blockPushed, parent->pushDirection, block, direction);
 
-    //g = parent->g+1;
-    g = parent->g;
+    g = parent->g+1;
+    //g = parent->g;
     if (parent->blockPushed != blockPushed) {
-        g += level.getGoals().size();
+        g += blocks.size()-1;
     }
     /*if (parent->parent == NULL) { // parent is start state
         level.pathTo(block, direction, level.getRobot()->getX(), level.getRobot()->getY(), &(parent->blocks));
@@ -278,9 +278,9 @@ void State::evaluate(std::vector<Goal *>& goals) {
                 }
             }
         }
-        if (distance != 0) {
-            h += distance+1;
-        }
+        //if (distance != 0) {
+            h += distance;//+1;
+        //}
     }
 }
 
