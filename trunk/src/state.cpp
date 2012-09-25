@@ -229,7 +229,7 @@ State::State(State* _parent, Level& level, unsigned int block, int direction)/*:
     //g = parent->g+1;
     g = parent->g;
     if (parent->blockPushed != blockPushed) {
-        g += blocks.size();
+        g += level.getGoals().size();
     }
     /*if (parent->parent == NULL) { // parent is start state
         level.pathTo(block, direction, level.getRobot()->getX(), level.getRobot()->getY(), &(parent->blocks));
