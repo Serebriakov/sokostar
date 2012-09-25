@@ -107,17 +107,19 @@ void SokoStar::printSolution() {
         //printf("\nSolution:\n");
         for (int i = (int)rBlocksPushed.size()-1; i >= 0; i--) {
             for (int j = (int)rRobotMovements[rRobotMovements.size()-i-1].size()-1; j >= 0; j--) {
-                printf("%d. Move %s\n", step++, asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
+                printf("%d. Move %s\n", step, asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
                 //printf("%c", asDirection(rRobotMovements[rRobotMovements.size()-i-1][j])[0]-'A'+'a');
                 if (f != NULL) {
-                    fprintf(f, "%d. Move %s\n", step++, asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
+                    fprintf(f, "%d. Move %s\n", step, asDirection(rRobotMovements[rRobotMovements.size()-i-1][j]));
                 }
+                step++;
             }
-            printf("%d. Push block(%d) %s\n", step++, rBlocksPushed[i], asDirection(rPushDirection[i]));
+            printf("%d. Push block(%d) %s\n", step, rBlocksPushed[i], asDirection(rPushDirection[i]));
             //printf("%c", asDirection(rPushDirection[i])[0]);
             if (f != NULL) {
-                fprintf(f, "%d. Push block(%d) %s\n", step++, rBlocksPushed[i], asDirection(rPushDirection[i]));
+                fprintf(f, "%d. Push block(%d) %s\n", step, rBlocksPushed[i], asDirection(rPushDirection[i]));
             }
+            step++;
         }
         printf("\n");
         if (f != NULL) {
